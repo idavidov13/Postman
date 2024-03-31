@@ -5,6 +5,8 @@ The API documentation for simple-grocery-store can be found on the following lin
 The API is available at https://simple-grocery-store-api.glitch.me
 # Simple Grocery Store API
 
+The documentation for another API, used for training, can be found on the following link - https://github.com/vdespa/Postman-Complete-Guide-API-Testing/blob/main/valentines-book-list.md
+
 This API allows you to place a grocery order which will be ready for pick-up in the store.
 
 The API is available at `https://simple-grocery-store-api.glitch.me`
