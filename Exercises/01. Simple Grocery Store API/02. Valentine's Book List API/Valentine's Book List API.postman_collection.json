@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "737e46a5-5cee-41f7-805e-eff16efba0c9",
+		"name": "Valentine's Book List API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22794277",
+		"_collection_link": "https://www.postman.com/orange-eclipse-461318/workspace/postman-course/collection/22794277-737e46a5-5cee-41f7-805e-eff16efba0c9?action=share&source=collection_link&creator=22794277"
+	},
+	"item": [
+		{
+			"name": "GET Status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/status",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET a book list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/books/lists?api-key=8fhg93xkjd38fhg834jdfgjd&list=non-fiction&page=4",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"books",
+						"lists"
+					],
+					"query": [
+						{
+							"key": "api-key",
+							"value": "8fhg93xkjd38fhg834jdfgjd"
+						},
+						{
+							"key": "list",
+							"value": "non-fiction"
+						},
+						{
+							"key": "page",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://valentines-book-list.glitch.me"
+		}
+	]
+}
