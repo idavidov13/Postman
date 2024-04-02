@@ -35,7 +35,9 @@
 									"pm.test(\"Status should be UP\", function () {\r",
 									"    var jsonData = pm.response.json();\r",
 									"    pm.expect(jsonData.status).to.eql('UP');\r",
-									"});"
+									"});\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -66,7 +68,23 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('At least one available product exists', () => {\r",
+									"    const response=pm.response.json();\r",
+									"\r",
+									"    pm.expect(response).to.be.an('array');\r",
+									"    pm.expect(response.length).to.be.above(0);\r",
+									"\r",
+									"    const product = response[0];\r",
+									"    pm.expect(product).to.be.an('object');\r",
+									"    pm.expect(product).to.haveOwnProperty('id');\r",
+									"    pm.expect(product.id).to.be.a('number');\r",
+									"    pm.expect(product).to.haveOwnProperty('inStock');\r",
+									"    pm.expect(product.inStock).to.be.true;\r",
+									"\r",
+									"    pm.collectionVariables.set('productId', product.id)\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -77,7 +95,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/products",
+							"raw": "{{baseUrl}}/products?available=true",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -87,13 +105,17 @@
 							"query": [
 								{
 									"key": "category",
-									"value": "dairy",
+									"value": "eggs",
 									"disabled": true
 								},
 								{
 									"key": "results",
 									"value": "2",
 									"disabled": true
+								},
+								{
+									"key": "available",
+									"value": "true"
 								}
 							]
 						}
@@ -128,7 +150,13 @@
 									"\r",
 									"pm.test(\"inStock\", function () {\r",
 									"  pm.expect(response.inStock).to.eql(true);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('Correct product was retrieved', ()=>{\r",
+									"    pm.expect(response.id).to.eql(pm.collectionVariables.get('productId'))\r",
+									"})\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -150,7 +178,7 @@
 							"variable": [
 								{
 									"key": "productId",
-									"value": "4643"
+									"value": "{{productId}}"
 								}
 							]
 						}
@@ -166,7 +194,19 @@
 								"exec": [
 									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('The new cart is created successfully', () => {\r",
+									"    const cart=pm.response.json();\r",
+									"\r",
+									"    pm.expect(cart).to.be.an('object');\r",
+									"    pm.expect(cart).to.haveOwnProperty('created');\r",
+									"    pm.expect(cart.created).to.be.true;\r",
+									"    pm.expect(cart).to.haveOwnProperty('cartId');\r",
+									"    pm.expect(cart.cartId).to.be.a('string');\r",
+									"\r",
+									"    pm.collectionVariables.set('cartId', cart.cartId)\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -274,7 +314,19 @@
 								"exec": [
 									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('The new item is added successfully', () => {\r",
+									"    const item=pm.response.json();\r",
+									"\r",
+									"    pm.expect(item).to.be.an('object');\r",
+									"    pm.expect(item).to.haveOwnProperty('created');\r",
+									"    pm.expect(item.created).to.be.true;\r",
+									"    pm.expect(item).to.haveOwnProperty('itemId');\r",
+									"    pm.expect(item.itemId).to.be.a('number');\r",
+									"\r",
+									"    pm.collectionVariables.set('lastAddedItemId', item.itemId)\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -286,7 +338,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"productId\": 4646\r\n}",
+							"raw": "{\r\n    \"productId\": {{productId}}\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -327,6 +379,20 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function getRandomNumber(maxValue) {\r",
+									"    return Math.floor(Math.random() * maxValue +1)\r",
+									"}\r",
+									"\r",
+									"pm.collectionVariables.set('randomQuantity', getRandomNumber(14))"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
 					],
 					"request": {
@@ -344,7 +410,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"quantity\": 2\r\n}",
+							"raw": "{\r\n  \"quantity\": \"{{randomQuantity}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -369,7 +435,7 @@
 								},
 								{
 									"key": "itemId",
-									"value": "630780238"
+									"value": "{{lastAddedItemId}}"
 								}
 							]
 						}
@@ -407,7 +473,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"productId\": 4643,\r\n    \"quantity\": 2\r\n}",
+							"raw": "{\r\n    \"productId\": 4646,\r\n    \"quantity\": 2\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -432,7 +498,7 @@
 								},
 								{
 									"key": "itemId",
-									"value": "630780238"
+									"value": "{{lastAddedItemId}}"
 								}
 							]
 						}
@@ -486,7 +552,7 @@
 								},
 								{
 									"key": "itemId",
-									"value": "630780238"
+									"value": "{{lastAddedItemId}}"
 								}
 							]
 						}
@@ -542,7 +608,19 @@
 								"exec": [
 									"pm.test(\"Status code is 201\", function () {\r",
 									"    pm.response.to.have.status(201);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('The new order is created successfully', () => {\r",
+									"    const order=pm.response.json();\r",
+									"\r",
+									"    pm.expect(order).to.be.an('object');\r",
+									"    pm.expect(order).to.haveOwnProperty('created');\r",
+									"    pm.expect(order.created).to.be.true;\r",
+									"    pm.expect(order).to.haveOwnProperty('orderId');\r",
+									"    pm.expect(order.orderId).to.be.a('string');\r",
+									"\r",
+									"    pm.collectionVariables.set('orderId', order.orderId)\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -564,7 +642,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"cartId\": \"9GLD2me-PbzRkgc6dejRo\",\r\n    \"customerName\": \"{{$randomFullName}}\"\r\n}",
+							"raw": "{\r\n    \"cartId\": \"{{cartId}}\",\r\n    \"customerName\": \"{{$randomFullName}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -592,7 +670,55 @@
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
-									"});"
+									"});\r",
+									"\r",
+									"pm.test('Check if the last order is submitted',() => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.a('array');\r",
+									"    \r",
+									"    const curOrderId = pm.collectionVariables.get('orderId');\r",
+									"    let flag = false\r",
+									"    for (let i=0; i<response.length; i++) {\r",
+									"        if (response[i].id === curOrderId) {\r",
+									"            flag = true;\r",
+									"            break;\r",
+									"        }\r",
+									"    }\r",
+									"    pm.expect(flag).to.be.true \r",
+									"})\r",
+									"\r",
+									"pm.test('forEach check if the last order is submitted',() => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.a('array');\r",
+									"    const curOrderId = pm.collectionVariables.get('orderId');\r",
+									"    let flag = false\r",
+									"\r",
+									"    response.forEach((order) => {if (order.id === curOrderId) {\r",
+									"            flag = true;\r",
+									"        }})\r",
+									"    \r",
+									"    pm.expect(flag).to.be.true \r",
+									"})\r",
+									"\r",
+									"pm.test('find method check if the last order is submitted',() => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.be.a('array');\r",
+									"    const curOrderId = pm.collectionVariables.get('orderId');\r",
+									"    const found = response.find((order) => {return order.id == curOrderId})\r",
+									"    \r",
+									"    pm.expect(found.id).to.eql(curOrderId)\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"console.clear()"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -674,7 +800,7 @@
 							"variable": [
 								{
 									"key": "orderId",
-									"value": "2n92U0g4vN2Qd3OdsZIHH"
+									"value": "{{orderId}}"
 								}
 							]
 						}
@@ -731,7 +857,7 @@
 							"variable": [
 								{
 									"key": "orderId",
-									"value": "2n92U0g4vN2Qd3OdsZIHH"
+									"value": "{{orderId}}"
 								}
 							]
 						}
@@ -779,7 +905,7 @@
 							"variable": [
 								{
 									"key": "orderId",
-									"value": "2n92U0g4vN2Qd3OdsZIHH"
+									"value": "{{orderId}}"
 								}
 							]
 						}
@@ -793,9 +919,15 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});"
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test('The order is deleted successfully', ()=>{\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response).to.haveOwnProperty('error');\r",
+									"    pm.expect(response.error).to.include(pm.collectionVariables.get('orderId'))\r",
+									"})"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -827,7 +959,7 @@
 							"variable": [
 								{
 									"key": "orderId",
-									"value": "2n92U0g4vN2Qd3OdsZIHH"
+									"value": "{{orderId}}"
 								}
 							]
 						}
@@ -1222,6 +1354,53 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET All Products - Results = 0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test('Check Error Message', () => {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.error).to.eql(\"Invalid value for query parameter 'results'. Must be greater than 0.\")\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?results=-1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "invalid-category",
+									"disabled": true
+								},
+								{
+									"key": "results",
+									"value": "-1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -1262,6 +1441,30 @@
 			"key": "cartId",
 			"value": "THE CURRENT CART ID",
 			"type": "string"
+		},
+		{
+			"key": "firstName",
+			"value": ""
+		},
+		{
+			"key": "productId",
+			"value": ""
+		},
+		{
+			"key": "itemId",
+			"value": ""
+		},
+		{
+			"key": "orderId",
+			"value": ""
+		},
+		{
+			"key": "lastAddedItemId",
+			"value": ""
+		},
+		{
+			"key": "randomQuantity",
+			"value": ""
 		}
 	]
 }
