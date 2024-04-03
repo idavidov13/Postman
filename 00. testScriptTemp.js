@@ -48,8 +48,11 @@ pm.test("YOUR TEST NAME", () => {
   pm.collectionVariables.set("elId", el.id);
 });
 
-//Getting Variables from Script
+//Working with Collection Variables from Script
+pm.collectionVariables.set("KEY", "VALUE");
 pm.collectionVariables.get("KEY");
+pm.collectionVariables.unset("KEY");
+pm.collectionVariables.clear();
 //When we use variables for making a requst, we can test if the response has the correct data agains these variables.
 pm.test("YOUR TEST NAME", () => {
   const response = pm.response.json();
@@ -106,3 +109,32 @@ pm.test("find method check if the last order is submitted", () => {
 
   pm.expect(found.id).to.eql(curOrderId);
 });
+
+//EXECUTING TEST ONLY FOR SPECIFIC POSTMAN ENVIRONMENT
+if (pm.environment.name == "ENVIRONMENT NAME") {
+  pm.test("Status code is 400", function () {
+    pm.response.to.have.status(400);
+  });
+
+  pm.test("Check Error Message", () => {
+    const response = pm.response.json();
+    pm.expect(response.error).to.eql(
+      "Invalid value for query parameter 'results'. Must be greater than 0."
+    );
+  });
+}
+
+//WORKING ENVIRONMENT VARIABLES
+pm.environment.set("KEY", "VALUE");
+pm.environment.get("KEY");
+pm.environment.unset("KEY");
+pm.environment.clear();
+
+//USING VARIABLES BASED ON THE SCOPE
+pm.variables.get("KEY");
+
+//WORKING GLOBAL VARIABLES
+pm.globals.set("KEY", "VALUE");
+pm.globals.get("KEY");
+pm.globals.unset("KEY");
+pm.globals.clear();
