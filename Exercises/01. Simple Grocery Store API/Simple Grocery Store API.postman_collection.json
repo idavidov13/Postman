@@ -559,6 +559,66 @@
 					"response": []
 				},
 				{
+					"name": "Add item to the cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test('The new item is added successfully', () => {\r",
+									"    const item=pm.response.json();\r",
+									"\r",
+									"    pm.expect(item).to.be.an('object');\r",
+									"    pm.expect(item).to.haveOwnProperty('created');\r",
+									"    pm.expect(item.created).to.be.true;\r",
+									"    pm.expect(item).to.haveOwnProperty('itemId');\r",
+									"    pm.expect(item.itemId).to.be.a('number');\r",
+									"\r",
+									"    pm.environment.set('lastAddedItemId', item.itemId)\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productId\": {{productId}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carts/:cartId/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carts",
+								":cartId",
+								"items"
+							],
+							"variable": [
+								{
+									"key": "cartId",
+									"value": "{{cartId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Register API Client",
 					"event": [
 						{
@@ -572,6 +632,16 @@
 								"type": "text/javascript",
 								"packages": {}
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
 					],
 					"request": {
@@ -579,7 +649,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n   \"clientName\": \"Ivan\",\r\n   \"clientEmail\": \"ivan_test2@example.com\"\r\n}",
+							"raw": "{\r\n   \"clientName\": \"Ivan\",\r\n   \"clientEmail\": \"{{$randomEmail}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
